@@ -44,6 +44,7 @@ public class AutoKit extends OpMode {
             colorInd = (colorSensor.green()>colorSensor.red()) ? 0:2;
             colorInd = (Math.abs(colorSensor.green()-colorSensor.red()) <= 0.05) ? 1:colorInd;
             telemetry.addData("colorInd: ",colorInd);
+            telemetry.update();
         }
         armY.setPower(-0.1);
     }
@@ -88,6 +89,7 @@ public class AutoKit extends OpMode {
             colorInd = (Math.abs(colorSensor.green()-colorSensor.red()) <= 0.05) ? 1:colorInd;
             telemetry.addData("colorInd: ",colorInd);
             power = (new float[] {1,0.5f,0})[colorInd];
+            telemetry.update();
         }
         float circumference = 0.295276f*((float) Math.PI);
         float numRevsFor3Ft = 3f/circumference;
