@@ -35,7 +35,6 @@ import javafx.scene.paint.Color;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotorImpl;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import virtual_robot.controller.robots.classes.MechanumBot;
 import virtual_robot.keyboard.KeyState;
 
 import java.io.IOException;

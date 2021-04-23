@@ -1,5 +1,7 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.ftc16072;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -10,6 +12,10 @@ public class OpModeKit extends OpMode {
     private DcMotor right = null;
     private DcMotor armY = null;
     private Servo hand = null;
+    private RevColorSensorV3 colorSensor = null;
+    private TouchSensor touchSensor = null;
+
+    boolean buttonState = false;
 
     @Override
     public void init() {
@@ -18,6 +24,8 @@ public class OpModeKit extends OpMode {
         left.setDirection(DcMotor.Direction.REVERSE);
         armY = hardwareMap.dcMotor.get("arm_motor");
         hand = hardwareMap.servo.get("hand_servo");
+        colorSensor = (RevColorSensorV3) hardwareMap.get("color_sensor");
+        touchSensor = hardwareMap.touchSensor.get("touch_sensor");
     }
 
     @Override
@@ -49,7 +57,7 @@ public class OpModeKit extends OpMode {
                 left.setPower(ljy);
             }
         }
-        float speed = 0.1f;
+        float speed = 0.8f;
         float lt = gamepad1.left_trigger;
         telemetry.addData("Left trigger", lt);
         float rt = gamepad1.right_trigger;
@@ -61,12 +69,19 @@ public class OpModeKit extends OpMode {
         boolean lb = gamepad1.left_bumper;
         telemetry.addData("Left bumper", lb);
         if (lb^rb){
-            hand.setPosition(hand.getPosition()+0.0005*(lb ? -1 : 1));
+            hand.setPosition(hand.getPosition()+(0.002*(lb ? -1 : 1)));
         }
         telemetry.addData("Left motor", left.getPower());
         telemetry.addData("Right motor", right.getPower());
         telemetry.addData("Arm motor", armY.getPower());
-        telemetry.addData("Hand Servo", hand.getPosition()*180);
+        telemetry.addData("Hand Servo", hand.getPosition());
+        String rgba = "("+colorSensor.red()+", "+colorSensor.green()+", "+colorSensor.blue()+", "+colorSensor.alpha()+")";
+        telemetry.addData("Color Sensor RGBA", rgba);
+        if (touchSensor.isPressed()) {
+            buttonState = !buttonState;
+        }
+        telemetry.addData("Button State", buttonState);
+        telemetry.addData("Touch Sensor", touchSensor.isPressed() ? " Is Pressed" : "Not Pressed");
 
         telemetry.update();
     }

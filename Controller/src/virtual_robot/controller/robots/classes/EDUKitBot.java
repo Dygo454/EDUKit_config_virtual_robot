@@ -4,10 +4,10 @@ import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.hardware.configuration.MotorType;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import virtual_robot.controller.BotConfig;
 import virtual_robot.controller.VirtualBot;
+import virtual_robot.controller.VirtualRobotController;
 
 @BotConfig(name = "EDU Kit Bot", filename = "edu_kit_bot")
 public class EDUKitBot extends VirtualBot {
@@ -17,6 +17,7 @@ public class EDUKitBot extends VirtualBot {
     private DcMotorExImpl rightMotor = null;
     private DcMotorExImpl armMotor = null;
     private ServoImpl servo = null;
+    private VirtualRobotController.ColorSensorImpl colorSensor = null;
 
     private double armRot;
 
@@ -30,18 +31,20 @@ public class EDUKitBot extends VirtualBot {
 
     public EDUKitBot(){
         super();
+    }
+
+    public void initialize(){
+        super.initialize();
         hardwareMap.setActive(true);
         leftMotor = (DcMotorExImpl)hardwareMap.get(DcMotorEx.class, "left_motor");
         rightMotor = (DcMotorExImpl)hardwareMap.get(DcMotorEx.class, "right_motor");
         armMotor = (DcMotorExImpl)hardwareMap.get(DcMotorEx.class, "arm_motor");
         servo = (ServoImpl)hardwareMap.servo.get("hand_servo");
+        colorSensor = (VirtualRobotController.ColorSensorImpl)hardwareMap.colorSensor.get("color_sensor");
         wheelCircumference = Math.PI * botWidth / 4.5;
         interWheelDistance = botWidth * 8.0 / 9.0;
         hardwareMap.setActive(false);
         armRot = 120;
-    }
-
-    public void initialize(){
         arm.getTransforms().add(new Rotate(0, 37.5, 67.5));
         hand.getTransforms().add(new Rotate(0, 0, 0));
     }
@@ -53,6 +56,7 @@ public class EDUKitBot extends VirtualBot {
         hardwareMap.put("right_motor", new DcMotorExImpl(motorType));
         hardwareMap.put("arm_motor", new DcMotorExImpl(motorType));
         hardwareMap.put("hand_servo", new ServoImpl());
+        hardwareMap.put("color_sensor", controller.new ColorSensorImpl());
     }
 
     public synchronized void updateStateAndSensors(double millis){
@@ -66,6 +70,7 @@ public class EDUKitBot extends VirtualBot {
         double headingChange = (rightWheelDist - leftWheelDist) / interWheelDistance;
         double deltaRobotX = -distTraveled * Math.sin(headingRadians + headingChange / 2.0);
         double deltaRobotY = distTraveled * Math.cos(headingRadians + headingChange / 2.0);
+        colorSensor.updateColor(x, y);
 
         x += deltaRobotX;
         y += deltaRobotY;
@@ -81,7 +86,7 @@ public class EDUKitBot extends VirtualBot {
     public synchronized void updateDisplay(){
         super.updateDisplay();
         ((Rotate) arm.getTransforms().get(0)).setAngle(armRot);
-        ((Rotate) hand.getTransforms().get(0)).setAngle(servo.getInternalPosition()*180);
+        ((Rotate) hand.getTransforms().get(0)).setAngle(servo.getInternalPosition());
     }
 
     public void powerDownAndReset(){
